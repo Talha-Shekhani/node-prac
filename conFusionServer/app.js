@@ -18,6 +18,7 @@ var leaderRouter = require('./routes/leaderRouter')
 const mongoose = require('mongoose');
 const Dishes = require('./models/dishes');
 const { db } = require('./models/dishes');
+
 const url = config.mongoUrl
 const connect = mongoose.connect(url)
 connect.then((db) => {
@@ -25,6 +26,14 @@ connect.then((db) => {
 }, (err) => console.log('Error: ' + err))
 
 var app = express();
+app.all('*', (req, res, next) => {
+    if (req.secure) {
+        return next()
+    } else {
+        res.redirect(307, `https://${req.hostname}:${app.get('secPort')}${req.url}`)
+        console.log(req.hostname, req.url)
+    }
+})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -57,19 +66,19 @@ app.use('/users', usersRouter)
 //         next()
 //     }
 
-    // if (!req.session.user) {
-    //     var err = new Error('You are not authenticaed!')
-    //     err.status = 401
-    //     return next(err)
-    // } else {
-    //     if (req.session.user === 'authenticated') {
-    //         next()
-    //     } else {
-    //         var err = new Error('You are not authenticaed!')
-    //         err.status = 403
-    //         return next(err)
-    //     }
-    // }
+// if (!req.session.user) {
+//     var err = new Error('You are not authenticaed!')
+//     err.status = 401
+//     return next(err)
+// } else {
+//     if (req.session.user === 'authenticated') {
+//         next()
+//     } else {
+//         var err = new Error('You are not authenticaed!')
+//         err.status = 403
+//         return next(err)
+//     }
+// }
 // }
 // app.use(auth)
 
